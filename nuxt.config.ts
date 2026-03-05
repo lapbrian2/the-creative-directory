@@ -52,4 +52,16 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
+
+  runtimeConfig: {
+    tursoDbUrl: process.env.TURSO_DATABASE_URL || 'file:local.db',
+    tursoAuthToken: process.env.TURSO_AUTH_TOKEN || '',
+  },
+
+  routeRules: {
+    '/api/**': { cors: true },
+    '/images/**': {
+      headers: { 'cache-control': 'public, max-age=31536000, immutable' },
+    },
+  },
 })

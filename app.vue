@@ -1,5 +1,6 @@
 <template>
   <div class="grain-overlay vignette min-h-screen bg-dark-900">
+    <ClientOnly><CustomCursor /></ClientOnly>
     <!-- Scroll progress bar -->
     <div class="fixed top-0 left-0 w-full h-[2px] z-50 origin-left scale-x-0 bg-accent-orange scroll-progress" />
 

@@ -164,6 +164,20 @@ useHead({
   title: computed(() => creative.value ? `${creative.value.name} — The Creative Directory` : 'Not Found'),
 })
 
+watch(creative, (c) => {
+  if (c) {
+    useCreativeJsonLd({
+      name: c.name,
+      title: c.title,
+      bio: c.bio,
+      avatar: c.avatar,
+      slug: c.slug,
+      location: c.location,
+      links: c.links,
+    })
+  }
+}, { immediate: true })
+
 const categoryLabels: Record<string, string> = {
   'ai-artist': 'AI Artist',
   designer: 'Designer',

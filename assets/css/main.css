@@ -84,3 +84,39 @@ body {
 .scroll-progress {
   transform-origin: left;
 }
+
+/* Custom cursor */
+.custom-cursor {
+  position: fixed;
+  top: -10px;
+  left: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 107, 53, 0.4);
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+}
+.custom-cursor.active {
+  opacity: 1;
+}
+.custom-cursor.hovering {
+  width: 40px;
+  height: 40px;
+  top: -20px;
+  left: -20px;
+  border-color: rgba(255, 107, 53, 0.8);
+  background: rgba(255, 107, 53, 0.08);
+}
+
+/* Hide default cursor on desktop when custom cursor is active */
+@media (min-width: 1024px) and (hover: hover) {
+  body {
+    cursor: none;
+  }
+  a, button, [role="button"], input, select, textarea {
+    cursor: none;
+  }
+}
