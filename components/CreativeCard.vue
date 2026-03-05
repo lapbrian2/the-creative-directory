@@ -6,8 +6,8 @@
     <!-- Portfolio preview image -->
     <div class="relative aspect-[4/3] overflow-hidden">
       <img
-        :src="creative.portfolio[0]?.image"
-        :alt="creative.portfolio[0]?.title"
+        :src="creative.portfolioItems[0]?.image"
+        :alt="creative.portfolioItems[0]?.title"
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-dark-900/90 via-dark-900/20 to-transparent" />

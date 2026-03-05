@@ -32,6 +32,11 @@
         </div>
 
         <form v-else ref="formEl" class="space-y-8" @submit.prevent="handleSubmit">
+          <!-- Server error banner -->
+          <div v-if="serverError" class="px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-sm">
+            {{ serverError }}
+          </div>
+
           <!-- Name -->
           <div>
             <label for="name" class="block text-sm font-medium text-cream-100 mb-2">Full Name</label>
@@ -39,10 +44,11 @@
               id="name"
               v-model="form.name"
               type="text"
-              required
-              class="w-full px-4 py-3 bg-dark-700/50 border border-cream-50/8 rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              class="w-full px-4 py-3 bg-dark-700/50 border rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              :class="fieldErrors.name ? 'border-red-500/50' : 'border-cream-50/8'"
               placeholder="Your full name"
             />
+            <p v-if="fieldErrors.name" class="mt-1.5 text-xs text-red-400">{{ fieldErrors.name }}</p>
           </div>
 
           <!-- Email -->
@@ -52,10 +58,11 @@
               id="email"
               v-model="form.email"
               type="email"
-              required
-              class="w-full px-4 py-3 bg-dark-700/50 border border-cream-50/8 rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              class="w-full px-4 py-3 bg-dark-700/50 border rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              :class="fieldErrors.email ? 'border-red-500/50' : 'border-cream-50/8'"
               placeholder="your@email.com"
             />
+            <p v-if="fieldErrors.email" class="mt-1.5 text-xs text-red-400">{{ fieldErrors.email }}</p>
           </div>
 
           <!-- Category -->
@@ -64,14 +71,15 @@
             <select
               id="category"
               v-model="form.category"
-              required
-              class="w-full px-4 py-3 bg-dark-700/50 border border-cream-50/8 rounded-lg text-cream-100 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              class="w-full px-4 py-3 bg-dark-700/50 border rounded-lg text-cream-100 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              :class="fieldErrors.category ? 'border-red-500/50' : 'border-cream-50/8'"
             >
               <option value="" disabled>Select a category</option>
               <option value="ai-artist">AI Artist</option>
               <option value="designer">Graphic Designer</option>
               <option value="builder">Builder</option>
             </select>
+            <p v-if="fieldErrors.category" class="mt-1.5 text-xs text-red-400">{{ fieldErrors.category }}</p>
           </div>
 
           <!-- Title -->
@@ -81,10 +89,11 @@
               id="title"
               v-model="form.title"
               type="text"
-              required
-              class="w-full px-4 py-3 bg-dark-700/50 border border-cream-50/8 rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              class="w-full px-4 py-3 bg-dark-700/50 border rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              :class="fieldErrors.title ? 'border-red-500/50' : 'border-cream-50/8'"
               placeholder="e.g. AI Visual Artist, Creative Technologist"
             />
+            <p v-if="fieldErrors.title" class="mt-1.5 text-xs text-red-400">{{ fieldErrors.title }}</p>
           </div>
 
           <!-- Bio -->
@@ -93,11 +102,12 @@
             <textarea
               id="bio"
               v-model="form.bio"
-              required
               rows="4"
-              class="w-full px-4 py-3 bg-dark-700/50 border border-cream-50/8 rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all resize-none"
+              class="w-full px-4 py-3 bg-dark-700/50 border rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all resize-none"
+              :class="fieldErrors.bio ? 'border-red-500/50' : 'border-cream-50/8'"
               placeholder="Tell us about your work and creative approach..."
             />
+            <p v-if="fieldErrors.bio" class="mt-1.5 text-xs text-red-400">{{ fieldErrors.bio }}</p>
           </div>
 
           <!-- Portfolio URL -->
@@ -107,10 +117,11 @@
               id="portfolio"
               v-model="form.portfolioUrl"
               type="url"
-              required
-              class="w-full px-4 py-3 bg-dark-700/50 border border-cream-50/8 rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              class="w-full px-4 py-3 bg-dark-700/50 border rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              :class="fieldErrors.portfolioUrl ? 'border-red-500/50' : 'border-cream-50/8'"
               placeholder="https://your-portfolio.com"
             />
+            <p v-if="fieldErrors.portfolioUrl" class="mt-1.5 text-xs text-red-400">{{ fieldErrors.portfolioUrl }}</p>
           </div>
 
           <!-- Location -->
@@ -120,9 +131,11 @@
               id="location"
               v-model="form.location"
               type="text"
-              class="w-full px-4 py-3 bg-dark-700/50 border border-cream-50/8 rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              class="w-full px-4 py-3 bg-dark-700/50 border rounded-lg text-cream-100 placeholder-cream-300/30 focus:outline-none focus:border-accent-orange/50 focus:ring-1 focus:ring-accent-orange/20 transition-all"
+              :class="fieldErrors.location ? 'border-red-500/50' : 'border-cream-50/8'"
               placeholder="City, Country"
             />
+            <p v-if="fieldErrors.location" class="mt-1.5 text-xs text-red-400">{{ fieldErrors.location }}</p>
           </div>
 
           <button
@@ -139,7 +152,8 @@
 </template>
 
 <script setup lang="ts">
-import { gsap } from 'gsap'
+import { ZodError } from 'zod'
+import { submissionSchema } from '~/composables/useValidation'
 
 useHead({ title: 'Submit Your Work — The Creative Directory' })
 
@@ -147,6 +161,8 @@ const formHeader = ref<HTMLElement>()
 const formEl = ref<HTMLFormElement>()
 const submitted = ref(false)
 const isSubmitting = ref(false)
+const serverError = ref('')
+const fieldErrors = ref<Record<string, string>>({})
 
 const form = reactive({
   name: '',
@@ -159,22 +175,64 @@ const form = reactive({
 })
 
 async function handleSubmit() {
+  // Clear previous errors
+  fieldErrors.value = {}
+  serverError.value = ''
+
+  // Client-side Zod validation
+  const result = submissionSchema.safeParse(form)
+  if (!result.success) {
+    const flattened = result.error.flatten().fieldErrors
+    for (const [key, messages] of Object.entries(flattened)) {
+      if (messages && messages.length > 0) {
+        fieldErrors.value[key] = messages[0]
+      }
+    }
+    return
+  }
+
   isSubmitting.value = true
-  // Simulate submission delay (replace with real API call)
-  await new Promise(resolve => setTimeout(resolve, 1500))
-  submitted.value = true
-  isSubmitting.value = false
+
+  try {
+    await $fetch('/api/submissions', {
+      method: 'POST',
+      body: result.data,
+    })
+    submitted.value = true
+  } catch (error: unknown) {
+    // Handle server validation errors (422)
+    if (error && typeof error === 'object' && 'data' in error) {
+      const fetchError = error as { statusCode?: number; data?: { data?: Record<string, string[]> }; statusMessage?: string }
+      if (fetchError.statusCode === 422 && fetchError.data?.data) {
+        for (const [key, messages] of Object.entries(fetchError.data.data)) {
+          if (messages && messages.length > 0) {
+            fieldErrors.value[key] = messages[0]
+          }
+        }
+      } else {
+        serverError.value = fetchError.statusMessage || 'Something went wrong. Please try again.'
+      }
+    } else {
+      serverError.value = 'Something went wrong. Please try again.'
+    }
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 onMounted(() => {
-  if (formHeader.value) {
-    gsap.from(formHeader.value.children, {
-      y: 20,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: 'power3.out',
-      delay: 0.1,
+  if (import.meta.client && formHeader.value) {
+    import('gsap').then(({ gsap }) => {
+      if (formHeader.value) {
+        gsap.from(formHeader.value.children, {
+          y: 20,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: 'power3.out',
+          delay: 0.1,
+        })
+      }
     })
   }
 })

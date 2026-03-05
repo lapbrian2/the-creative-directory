@@ -34,68 +34,89 @@
 
       <!-- Featured creatives preview -->
       <div ref="featuredRow" class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <NuxtLink
-          v-for="creative in featured"
-          :key="creative.slug"
-          :to="`/creatives/${creative.slug}`"
-          class="group glass rounded-xl p-5 hover:border-cream-50/10 transition-all duration-300"
-        >
-          <div class="flex items-center gap-4 mb-3">
-            <img
-              :src="creative.avatar"
-              :alt="creative.name"
-              class="w-12 h-12 rounded-full object-cover ring-2 ring-cream-50/10"
-            />
-            <div>
-              <h3 class="font-display font-semibold text-cream-50 group-hover:text-accent-orange transition-colors">
-                {{ creative.name }}
-              </h3>
-              <p class="text-xs text-cream-300">{{ creative.title }}</p>
+        <template v-if="status === 'pending'">
+          <div v-for="i in 3" :key="i" class="glass rounded-xl p-5 animate-pulse">
+            <div class="flex items-center gap-4 mb-3">
+              <div class="w-12 h-12 rounded-full bg-cream-50/5" />
+              <div class="flex-1">
+                <div class="h-4 w-24 bg-cream-50/5 rounded mb-2" />
+                <div class="h-3 w-16 bg-cream-50/5 rounded" />
+              </div>
             </div>
+            <div class="h-3 w-full bg-cream-50/5 rounded mb-2" />
+            <div class="h-3 w-2/3 bg-cream-50/5 rounded" />
           </div>
-          <p class="text-sm text-cream-200/70 line-clamp-2">{{ creative.bio }}</p>
-          <div class="flex gap-2 mt-3">
-            <span
-              v-for="tag in creative.tags.slice(0, 2)"
-              :key="tag"
-              class="text-[10px] uppercase tracking-wider text-cream-300/60 px-2 py-0.5 rounded-full border border-cream-50/5"
-            >
-              {{ tag }}
-            </span>
-          </div>
-        </NuxtLink>
+        </template>
+        <template v-else-if="featured?.length">
+          <NuxtLink
+            v-for="creative in featured"
+            :key="creative.slug"
+            :to="`/creatives/${creative.slug}`"
+            class="group glass rounded-xl p-5 hover:border-cream-50/10 transition-all duration-300"
+          >
+            <div class="flex items-center gap-4 mb-3">
+              <img
+                :src="creative.avatar"
+                :alt="creative.name"
+                class="w-12 h-12 rounded-full object-cover ring-2 ring-cream-50/10"
+              />
+              <div>
+                <h3 class="font-display font-semibold text-cream-50 group-hover:text-accent-orange transition-colors">
+                  {{ creative.name }}
+                </h3>
+                <p class="text-xs text-cream-300">{{ creative.title }}</p>
+              </div>
+            </div>
+            <p class="text-sm text-cream-200/70 line-clamp-2">{{ creative.bio }}</p>
+            <div class="flex gap-2 mt-3">
+              <span
+                v-for="tag in creative.tags.slice(0, 2)"
+                :key="tag"
+                class="text-[10px] uppercase tracking-wider text-cream-300/60 px-2 py-0.5 rounded-full border border-cream-50/5"
+              >
+                {{ tag }}
+              </span>
+            </div>
+          </NuxtLink>
+        </template>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { gsap } from 'gsap'
-import { creatives } from '~/data/creatives'
+import type { Creative } from '~/data/creatives'
 
-const featured = creatives.filter(c => c.featured)
+const { data: featured, status } = useFetch<Creative[]>('/api/creatives', {
+  query: { featured: true },
+})
+
 const heroContent = ref<HTMLElement>()
 const featuredRow = ref<HTMLElement>()
 
 onMounted(() => {
-  if (heroContent.value) {
-    gsap.from(heroContent.value.children, {
-      y: 30,
-      opacity: 0,
-      duration: 1,
-      stagger: 0.15,
-      ease: 'power3.out',
-      delay: 0.2,
-    })
-  }
-  if (featuredRow.value) {
-    gsap.from(featuredRow.value.children, {
-      y: 40,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.12,
-      ease: 'power2.out',
-      delay: 0.8,
+  if (import.meta.client) {
+    import('gsap').then(({ gsap }) => {
+      if (heroContent.value) {
+        gsap.from(heroContent.value.children, {
+          y: 30,
+          opacity: 0,
+          duration: 1,
+          stagger: 0.15,
+          ease: 'power3.out',
+          delay: 0.2,
+        })
+      }
+      if (featuredRow.value) {
+        gsap.from(featuredRow.value.children, {
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.12,
+          ease: 'power2.out',
+          delay: 0.8,
+        })
+      }
     })
   }
 })

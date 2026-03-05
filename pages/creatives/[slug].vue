@@ -1,5 +1,44 @@
 <template>
-  <main v-if="creative" class="pt-28 pb-20">
+  <!-- Loading state -->
+  <main v-if="status === 'pending'" class="pt-28 pb-20">
+    <div class="section">
+      <div class="animate-pulse">
+        <div class="h-4 w-32 bg-cream-50/5 rounded mb-10" />
+        <div class="flex flex-col md:flex-row items-start gap-8 mb-16">
+          <div class="w-28 h-28 rounded-2xl bg-cream-50/5" />
+          <div class="flex-1">
+            <div class="h-5 w-20 bg-cream-50/5 rounded-full mb-4" />
+            <div class="h-8 w-48 bg-cream-50/5 rounded mb-2" />
+            <div class="h-5 w-36 bg-cream-50/5 rounded mb-4" />
+            <div class="h-4 w-full max-w-2xl bg-cream-50/5 rounded mb-2" />
+            <div class="h-4 w-2/3 max-w-2xl bg-cream-50/5 rounded" />
+          </div>
+        </div>
+        <div class="h-6 w-24 bg-cream-50/5 rounded mb-6" />
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div v-for="i in 3" :key="i" class="aspect-[4/3] bg-cream-50/5 rounded-xl" />
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Error state -->
+  <main v-else-if="error" class="pt-28 pb-20">
+    <div class="section text-center">
+      <h1 class="font-display text-heading font-bold text-cream-50 mb-4">
+        {{ error.statusCode === 404 ? 'Creative Not Found' : 'Something went wrong' }}
+      </h1>
+      <p class="text-cream-200/60 mb-8">
+        {{ error.statusCode === 404 ? "This profile doesn't exist or has been removed." : 'Failed to load this profile. Please try again.' }}
+      </p>
+      <NuxtLink to="/" class="text-accent-orange hover:text-accent-orange-hover transition-colors font-medium">
+        Back to Directory
+      </NuxtLink>
+    </div>
+  </main>
+
+  <!-- Loaded state -->
+  <main v-else-if="creative" class="pt-28 pb-20">
     <div class="section">
       <!-- Back link -->
       <NuxtLink to="/#directory" class="inline-flex items-center gap-2 text-sm text-cream-300 hover:text-cream-50 transition-colors mb-10">
@@ -57,8 +96,8 @@
       </div>
       <div ref="portfolioGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
-          v-for="(item, i) in creative.portfolio"
-          :key="i"
+          v-for="(item, i) in creative.portfolioItems"
+          :key="item.id"
           class="group glass rounded-xl overflow-hidden cursor-pointer"
           @click="openLightbox(i)"
         >
@@ -97,31 +136,21 @@
         </button>
         <img
           v-if="lightboxIndex !== null"
-          :src="creative.portfolio[lightboxIndex].image"
-          :alt="creative.portfolio[lightboxIndex].title"
+          :src="creative.portfolioItems[lightboxIndex].image"
+          :alt="creative.portfolioItems[lightboxIndex].title"
           class="max-w-full max-h-[80vh] object-contain rounded-lg"
         />
       </div>
     </Transition>
   </main>
-
-  <main v-else class="pt-28 pb-20">
-    <div class="section text-center">
-      <h1 class="font-display text-heading font-bold text-cream-50 mb-4">Creative Not Found</h1>
-      <p class="text-cream-200/60 mb-8">This profile doesn't exist or has been removed.</p>
-      <NuxtLink to="/" class="text-accent-orange hover:text-accent-orange-hover transition-colors font-medium">
-        Back to Directory
-      </NuxtLink>
-    </div>
-  </main>
 </template>
 
 <script setup lang="ts">
-import { gsap } from 'gsap'
-import { creatives } from '~/data/creatives'
+import type { Creative } from '~/data/creatives'
 
 const route = useRoute()
-const creative = computed(() => creatives.find(c => c.slug === route.params.slug))
+
+const { data: creative, error, status } = useFetch<Creative>(`/api/creatives/${route.params.slug}`)
 
 const lightboxIndex = ref<number | null>(null)
 const profileHeader = ref<HTMLElement>()
@@ -147,24 +176,28 @@ const categoryClasses: Record<string, string> = {
 }
 
 onMounted(() => {
-  if (profileHeader.value) {
-    gsap.from(profileHeader.value.children, {
-      y: 20,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: 'power3.out',
-      delay: 0.1,
-    })
-  }
-  if (portfolioGrid.value) {
-    gsap.from(portfolioGrid.value.children, {
-      y: 30,
-      opacity: 0,
-      duration: 0.6,
-      stagger: 0.1,
-      ease: 'power2.out',
-      delay: 0.3,
+  if (import.meta.client) {
+    import('gsap').then(({ gsap }) => {
+      if (profileHeader.value) {
+        gsap.from(profileHeader.value.children, {
+          y: 20,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: 'power3.out',
+          delay: 0.1,
+        })
+      }
+      if (portfolioGrid.value) {
+        gsap.from(portfolioGrid.value.children, {
+          y: 30,
+          opacity: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power2.out',
+          delay: 0.3,
+        })
+      }
     })
   }
 })
