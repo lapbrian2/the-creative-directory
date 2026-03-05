@@ -8,18 +8,24 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Slug is required' })
   }
 
-  const creative = await db.query.creatives.findFirst({
-    where: eq(schema.creatives.slug, slug),
-    with: {
-      portfolioItems: {
-        orderBy: (items, { asc }) => [asc(items.sortOrder)],
+  try {
+    const creative = await db.query.creatives.findFirst({
+      where: eq(schema.creatives.slug, slug),
+      with: {
+        portfolioItems: {
+          orderBy: (items, { asc }) => [asc(items.sortOrder)],
+        },
       },
-    },
-  })
+    })
 
-  if (!creative) {
-    throw createError({ statusCode: 404, statusMessage: 'Creative not found' })
+    if (!creative) {
+      throw createError({ statusCode: 404, statusMessage: 'Creative not found' })
+    }
+
+    return creative
+  } catch (error) {
+    if ((error as { statusCode?: number }).statusCode) throw error
+    console.error('[creatives/slug] Error:', error instanceof Error ? error.message : error)
+    throw createError({ statusCode: 500, statusMessage: 'Internal server error' })
   }
-
-  return creative
 })

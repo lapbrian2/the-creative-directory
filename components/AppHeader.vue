@@ -21,7 +21,9 @@
       <!-- Mobile menu button -->
       <button
         class="md:hidden text-cream-200 hover:text-cream-50 transition-colors"
-        aria-label="Toggle menu"
+        :aria-expanded="mobileOpen"
+        aria-controls="mobile-nav"
+        aria-label="Toggle navigation menu"
         @click="mobileOpen = !mobileOpen"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,7 +35,7 @@
 
     <!-- Mobile menu -->
     <Transition name="slide-down">
-      <div v-if="mobileOpen" class="md:hidden glass mt-2 mx-4 rounded-lg p-4">
+      <div v-if="mobileOpen" id="mobile-nav" class="md:hidden glass mt-2 mx-4 rounded-lg p-4">
         <nav class="flex flex-col gap-4">
           <NuxtLink to="/" class="text-sm text-cream-200 hover:text-cream-50 transition-colors" @click="mobileOpen = false">
             Directory
@@ -51,11 +53,15 @@
 const scrolled = ref(false)
 const mobileOpen = ref(false)
 
+const onScroll = () => { scrolled.value = window.scrollY > 50 }
+
 onMounted(() => {
   scrolled.value = window.scrollY > 50
-  window.addEventListener('scroll', () => {
-    scrolled.value = window.scrollY > 50
-  }, { passive: true })
+  window.addEventListener('scroll', onScroll, { passive: true })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', onScroll)
 })
 </script>
 

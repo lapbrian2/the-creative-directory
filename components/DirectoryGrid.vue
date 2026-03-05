@@ -30,7 +30,14 @@
       />
     </div>
 
-    <p v-if="status !== 'pending' && (!creatives || creatives.length === 0)" class="text-center text-cream-300/50 py-20 text-lg">
+    <div v-if="error && status !== 'pending'" class="text-center py-20">
+      <p class="text-cream-300/60 text-lg mb-4">Failed to load creatives.</p>
+      <button class="text-sm text-accent-orange hover:text-accent-orange-hover transition-colors font-medium" @click="$router.go(0)">
+        Try again
+      </button>
+    </div>
+
+    <p v-else-if="status === 'success' && creatives?.length === 0" class="text-center text-cream-300/50 py-20 text-lg">
       No creatives found matching your criteria.
     </p>
   </section>
@@ -49,7 +56,7 @@ const queryParams = computed(() => ({
   search: searchQuery.value || undefined,
 }))
 
-const { data: creatives, status } = useFetch<Creative[]>('/api/creatives', {
+const { data: creatives, status, error } = useFetch<Creative[]>('/api/creatives', {
   query: queryParams,
 })
 

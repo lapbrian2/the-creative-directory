@@ -5,7 +5,7 @@
       <button
         v-for="cat in categories"
         :key="cat.value"
-        class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+        class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent-orange/50 focus-visible:outline-none"
         :class="modelValue === cat.value
           ? 'bg-accent-orange text-dark-900'
           : 'text-cream-200 border border-cream-50/8 hover:border-cream-50/15 hover:bg-cream-50/5'"

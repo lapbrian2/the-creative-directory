@@ -59,7 +59,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/api/**': { cors: true },
+    '/api/creatives/**': { cors: true },
     '/images/**': {
       headers: { 'cache-control': 'public, max-age=31536000, immutable' },
     },

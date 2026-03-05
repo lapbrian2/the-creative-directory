@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   try {
     const validated = submissionSchema.parse(body)
 
-    const [submission] = await db.insert(schema.submissions).values({
+    await db.insert(schema.submissions).values({
       name: validated.name,
       email: validated.email,
       category: validated.category,
@@ -16,9 +16,9 @@ export default defineEventHandler(async (event) => {
       bio: validated.bio,
       portfolioUrl: validated.portfolioUrl,
       location: validated.location || '',
-    }).returning()
+    })
 
-    return { success: true, id: submission.id }
+    return { success: true }
   } catch (error) {
     if (error instanceof ZodError) {
       throw createError({
@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
         data: error.flatten().fieldErrors,
       })
     }
-    throw error
+    console.error('[submissions] Error:', error instanceof Error ? error.message : error)
+    throw createError({ statusCode: 500, statusMessage: 'Internal server error' })
   }
 })

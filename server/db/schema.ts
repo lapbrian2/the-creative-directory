@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core'
 import { sql } from 'drizzle-orm'
 
 export const creatives = sqliteTable('creatives', {
@@ -15,7 +15,10 @@ export const creatives = sqliteTable('creatives', {
   links: text('links', { mode: 'json' }).notNull().$type<{ label: string; url: string }[]>(),
   createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
   updatedAt: text('updated_at').notNull().default(sql`(datetime('now'))`),
-})
+}, (t) => [
+  index('creatives_category_idx').on(t.category),
+  index('creatives_featured_idx').on(t.featured),
+])
 
 export const portfolioItems = sqliteTable('portfolio_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -24,7 +27,9 @@ export const portfolioItems = sqliteTable('portfolio_items', {
   image: text('image').notNull(),
   description: text('description').notNull().default(''),
   sortOrder: integer('sort_order').notNull().default(0),
-})
+}, (t) => [
+  index('portfolio_items_creative_id_idx').on(t.creativeId),
+])
 
 export const submissions = sqliteTable('submissions', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -44,4 +49,7 @@ export const pageViews = sqliteTable('page_views', {
   path: text('path').notNull(),
   referrer: text('referrer'),
   createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
-})
+}, (t) => [
+  index('page_views_path_idx').on(t.path),
+  index('page_views_created_at_idx').on(t.createdAt),
+])

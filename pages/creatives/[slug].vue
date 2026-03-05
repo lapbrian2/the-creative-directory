@@ -81,7 +81,7 @@
               :key="link.label"
               :href="link.url"
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               class="text-sm text-accent-orange hover:text-accent-orange-hover transition-colors font-medium"
             >
               {{ link.label }}
@@ -99,7 +99,11 @@
           v-for="(item, i) in creative.portfolioItems"
           :key="item.id"
           class="group glass rounded-xl overflow-hidden cursor-pointer"
+          role="button"
+          tabindex="0"
+          :aria-label="`View ${item.title}`"
           @click="openLightbox(i)"
+          @keydown.enter="openLightbox(i)"
         >
           <div class="relative aspect-[4/3] overflow-hidden">
             <img
@@ -118,15 +122,23 @@
       </div>
     </div>
 
-    <!-- Lightbox -->
+    <!-- Lightbox with keyboard navigation -->
     <Transition name="lightbox">
       <div
         v-if="lightboxIndex !== null"
         class="fixed inset-0 z-[200] bg-dark-900/95 flex items-center justify-center p-8"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="`${creative.portfolioItems[lightboxIndex]?.title} - fullscreen view`"
         @click.self="lightboxIndex = null"
+        @keydown.esc="lightboxIndex = null"
+        @keydown.left="prevImage"
+        @keydown.right="nextImage"
       >
+        <!-- Close -->
         <button
-          class="absolute top-6 right-6 text-cream-200 hover:text-cream-50 transition-colors"
+          ref="closeBtn"
+          class="absolute top-6 right-6 text-cream-200 hover:text-cream-50 transition-colors focus-visible:ring-2 focus-visible:ring-accent-orange/50 focus-visible:outline-none rounded-lg p-1"
           aria-label="Close lightbox"
           @click="lightboxIndex = null"
         >
@@ -134,12 +146,43 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
+
+        <!-- Prev -->
+        <button
+          v-if="creative.portfolioItems.length > 1"
+          class="absolute left-4 top-1/2 -translate-y-1/2 text-cream-200 hover:text-cream-50 transition-colors focus-visible:ring-2 focus-visible:ring-accent-orange/50 focus-visible:outline-none rounded-lg p-2"
+          aria-label="Previous image"
+          @click="prevImage"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <!-- Image -->
         <img
           v-if="lightboxIndex !== null"
           :src="creative.portfolioItems[lightboxIndex].image"
           :alt="creative.portfolioItems[lightboxIndex].title"
           class="max-w-full max-h-[80vh] object-contain rounded-lg"
         />
+
+        <!-- Next -->
+        <button
+          v-if="creative.portfolioItems.length > 1"
+          class="absolute right-4 top-1/2 -translate-y-1/2 text-cream-200 hover:text-cream-50 transition-colors focus-visible:ring-2 focus-visible:ring-accent-orange/50 focus-visible:outline-none rounded-lg p-2"
+          aria-label="Next image"
+          @click="nextImage"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        <!-- Counter -->
+        <div v-if="creative.portfolioItems.length > 1" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-cream-300/60 text-sm">
+          {{ (lightboxIndex ?? 0) + 1 }} / {{ creative.portfolioItems.length }}
+        </div>
       </div>
     </Transition>
   </main>
@@ -147,6 +190,7 @@
 
 <script setup lang="ts">
 import type { Creative } from '~/data/creatives'
+import { categoryLabels, categoryClasses } from '~/composables/useCategoryBadge'
 
 const route = useRoute()
 
@@ -155,9 +199,22 @@ const { data: creative, error, status } = useFetch<Creative>(`/api/creatives/${r
 const lightboxIndex = ref<number | null>(null)
 const profileHeader = ref<HTMLElement>()
 const portfolioGrid = ref<HTMLElement>()
+const closeBtn = ref<HTMLButtonElement>()
 
 function openLightbox(index: number) {
   lightboxIndex.value = index
+  nextTick(() => closeBtn.value?.focus())
+}
+
+function prevImage() {
+  if (lightboxIndex.value === null || !creative.value) return
+  const len = creative.value.portfolioItems.length
+  lightboxIndex.value = (lightboxIndex.value - 1 + len) % len
+}
+
+function nextImage() {
+  if (lightboxIndex.value === null || !creative.value) return
+  lightboxIndex.value = (lightboxIndex.value + 1) % creative.value.portfolioItems.length
 }
 
 useHead({
@@ -177,17 +234,6 @@ watch(creative, (c) => {
     })
   }
 }, { immediate: true })
-
-const categoryLabels: Record<string, string> = {
-  'ai-artist': 'AI Artist',
-  designer: 'Designer',
-  builder: 'Builder',
-}
-const categoryClasses: Record<string, string> = {
-  'ai-artist': 'bg-purple-500/20 text-purple-300 border border-purple-500/20',
-  designer: 'bg-blue-500/20 text-blue-300 border border-blue-500/20',
-  builder: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/20',
-}
 
 onMounted(() => {
   if (import.meta.client) {

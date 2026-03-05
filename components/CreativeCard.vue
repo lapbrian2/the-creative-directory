@@ -1,15 +1,19 @@
 <template>
   <NuxtLink
     :to="`/creatives/${creative.slug}`"
-    class="group block glass rounded-xl overflow-hidden hover:border-cream-50/10 transition-all duration-300"
+    class="group block glass rounded-xl overflow-hidden hover:border-cream-50/10 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-accent-orange/50 focus-visible:outline-none"
   >
     <!-- Portfolio preview image -->
-    <div class="relative aspect-[4/3] overflow-hidden">
+    <div class="relative aspect-[4/3] overflow-hidden bg-dark-700">
       <img
-        :src="creative.portfolioItems[0]?.image"
-        :alt="creative.portfolioItems[0]?.title"
+        v-if="creative.portfolioItems?.length"
+        :src="creative.portfolioItems[0].image"
+        :alt="creative.portfolioItems[0].title"
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
+      <div v-else class="w-full h-full flex items-center justify-center">
+        <span class="text-cream-300/30 text-sm">No portfolio image</span>
+      </div>
       <div class="absolute inset-0 bg-gradient-to-t from-dark-900/90 via-dark-900/20 to-transparent" />
 
       <!-- Category badge -->
@@ -55,18 +59,7 @@
 
 <script setup lang="ts">
 import type { Creative } from '~/data/creatives'
+import { categoryLabels, categoryClasses } from '~/composables/useCategoryBadge'
 
 defineProps<{ creative: Creative }>()
-
-const categoryLabels: Record<string, string> = {
-  'ai-artist': 'AI Artist',
-  designer: 'Designer',
-  builder: 'Builder',
-}
-
-const categoryClasses: Record<string, string> = {
-  'ai-artist': 'bg-purple-500/20 text-purple-300 border border-purple-500/20',
-  designer: 'bg-blue-500/20 text-blue-300 border border-blue-500/20',
-  builder: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/20',
-}
 </script>
