@@ -11,10 +11,11 @@
 </template>
 
 <script setup lang="ts">
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+onMounted(async () => {
+  const { gsap } = await import('gsap')
+  const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+  gsap.registerPlugin(ScrollTrigger)
 
-onMounted(() => {
   gsap.to('.scroll-progress', {
     scaleX: 1,
     ease: 'none',

@@ -1,6 +1,6 @@
 <template>
   <header class="fixed top-0 left-0 w-full z-40 transition-all duration-300"
-    :class="scrolled ? 'glass py-3' : 'py-6'">
+    :class="scrolled ? 'glass py-3' : 'py-6'" data-allow-mismatch>
     <div class="max-w-[1200px] mx-auto px-6 flex items-center justify-between">
       <NuxtLink to="/" class="font-display text-xl font-bold text-cream-50 tracking-tight hover:text-accent-orange transition-colors">
         TCD<span class="text-accent-orange">.</span>
@@ -52,6 +52,7 @@ const scrolled = ref(false)
 const mobileOpen = ref(false)
 
 onMounted(() => {
+  scrolled.value = window.scrollY > 50
   window.addEventListener('scroll', () => {
     scrolled.value = window.scrollY > 50
   }, { passive: true })

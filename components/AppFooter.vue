@@ -27,7 +27,7 @@
         </div>
       </div>
       <div class="mt-16 pt-8 border-t border-cream-50/5 text-center">
-        <p class="text-xs text-cream-300/50">&copy; {{ new Date().getFullYear() }} The Creative Directory. All rights reserved.</p>
+        <p class="text-xs text-cream-300/50">&copy; 2026 The Creative Directory. All rights reserved.</p>
       </div>
     </div>
   </footer>
